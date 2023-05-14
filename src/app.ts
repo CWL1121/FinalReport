@@ -13,17 +13,10 @@ app.use(cors({
   "preflightContinue": false,
   "optionsSuccessStatus": 200
 }))
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-})
 
-app.use(limiter)
-app.use(express.json({limit:'50mb'}));
+app.use(express.json({limit:'5000mb'}));
 app.use(express.urlencoded({ extended: false }))
-
+app.use('/assets', express.static('E:/demo/FinalReport/src/dist/assets'));
 for (const route of router) {
   app.use(route.getRouter())
 }
