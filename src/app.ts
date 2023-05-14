@@ -1,12 +1,10 @@
 import express from 'express'
+import rateLimit from 'express-rate-limit'
 import {router} from "./Routers"
-import { DataBase } from './utils/DataBase';
 import { logger } from './middlewares/log';
 const http = require('http');
 import cors from 'cors';
 const port = 444
-//http://localhost:444
-require('dotenv').config()
 const app: express.Application = express()
 const server = http.createServer(app);
 app.use(cors({
@@ -15,11 +13,16 @@ app.use(cors({
   "preflightContinue": false,
   "optionsSuccessStatus": 200
 }))
-const DB = new DataBase("mongodb://root:ethci2925@163.13.172.197:27018/noteDB")
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
+app.use(limiter)
 app.use(express.json({limit:'50mb'}));
 app.use(express.urlencoded({ extended: false }))
-app.use('/assets', express.static('/home/l676/project/R3f-editor-back/ETHCI-r3f-editor/dist/assets'));
 
 for (const route of router) {
   app.use(route.getRouter())
